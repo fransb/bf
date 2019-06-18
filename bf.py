@@ -75,7 +75,7 @@ with open(args.tacviewFile) as f:
             id = split_line[0]
             if not id in targets:
                 targets[id] = parseLine(line, refLat, refLong)
-                print(targets[id])
+                #print(targets["102"])
             #TODO add update of position
         elif "ReferenceLongitude" in line:
             refLong = Decimal(line.split("=")[1])
@@ -86,17 +86,18 @@ longmax = Decimal(0.0)
 longmin = Decimal(90.0)
 latmax = Decimal(0.0)
 latmin = Decimal(90.0)
-for target in targets:
-    print(target)
+for target in targets.values():
     if longmax < target["long"]:
         longmax = target["long"]
     if latmax < target["lat"]:
         latmax = target["lat"]
+        print(latmax)
     if longmin > target["long"]:
         longmin = target["long"]
     if latmin > target["lat"]:
         latmin = target["lat"]
+        print(latmin)
 
-lat = input("Enter latitude for target in format %i-%i" % (latmax, latmin))
+lat = input("Enter latitude for target in format %d-%d" % (latmin, latmax))
 long = input("Enter longitude for target in format xx.xxxx")
 print(targets["102"])
