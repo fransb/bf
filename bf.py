@@ -1,7 +1,5 @@
 import argparse
 from decimal import *
-from pip._vendor.pytoml.writer import long
-from Tools.scripts.highlight import latex_highlight
 
 #102,T=5.738246|3.5607517|1|||359|-151467.48|-65955.93|,Type=Ground+Static+Aerodrome,Name=Oil rig,Color=Red,Coalition=Allies,Country=us
 
@@ -47,7 +45,8 @@ def parseLine(line, refLat, refLong):
     tacobject["coalition"] = coalition
     tacobject["country"] = country
     tacobject["group"] = group
-    
+    if id == "0":
+        print(line)
     
     return tacobject
 
@@ -73,10 +72,14 @@ with open(args.tacviewFile) as f:
         elif fileStarted:
             split_line = line.split(",")
             id = split_line[0]
-            if not id in targets:
+            if id[0] == "-":
+                pass
+                #TODO delete tecical object
+            elif id == "0":
+                pass
+                #TODO handle special object
+            elif not id in targets:
                 targets[id] = parseLine(line, refLat, refLong)
-                #print(targets["102"])
-            #TODO add update of position
         elif "ReferenceLongitude" in line:
             refLong = Decimal(line.split("=")[1])
         elif "ReferenceLatitude" in line:
@@ -91,13 +94,24 @@ for target in targets.values():
         longmax = target["long"]
     if latmax < target["lat"]:
         latmax = target["lat"]
-        print(latmax)
     if longmin > target["long"]:
         longmin = target["long"]
     if latmin > target["lat"]:
         latmin = target["lat"]
-        print(latmin)
+        #print(target)
 
-lat = input("Enter latitude for target in format %d-%d" % (latmin, latmax))
-long = input("Enter longitude for target in format xx.xxxx")
-print(targets["102"])
+lat = Decimal(input("Enter latitude for target in format " + str(latmin) + "-" + str(latmax) + ": ").replace(",","."))
+long = Decimal(input("Enter longitude for target in format " + str(longmin) + "-" + str(longmax) + ": ").replace(",","."))
+
+distanses = dict()
+for target in targets.values():
+    if "Ground" in target["type"] or "Sea" in target["type"] :
+        distance = ((target["lat"]-lat)**2+(target["long"]-long)**2).sqrt()
+        target["distance"]=distance
+        distanses[target["id"]]=target
+
+
+for distance in distanses.values():
+    if distance["distance"] < Decimal(0.05):
+        print(str(distance["distance"])+", "+distance["type"]+", "+distance["name"]+", "+str(distance["long"])+", "+str(distance["lat"])+", "+str(distance["alt"])+" m")
+
