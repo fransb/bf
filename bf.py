@@ -1,7 +1,6 @@
 import argparse
 from decimal import *
 
-#102,T=5.738246|3.5607517|1|||359|-151467.48|-65955.93|,Type=Ground+Static+Aerodrome,Name=Oil rig,Color=Red,Coalition=Allies,Country=us
 
 def parseLine(line, refLat, refLong):
     tacobject = dict()
