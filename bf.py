@@ -1,10 +1,12 @@
 import argparse
 from decimal import *
 from operator import itemgetter
-#102,T=5.738246|3.5607517|1|||359|-151467.48|-65955.93|,Type=Ground+Static+Aerodrome,Name=Oil rig,Color=Red,Coalition=Allies,Country=us
+
 def sortDist(val): 
     return float(val["distance"])
 def parseLine(line, refLat, refLong, file):
+
+def parseLine(line, refLat, refLong):
     tacobject = dict()
     id = ""
     long = Decimal(0.0)
@@ -48,10 +50,8 @@ def parseLine(line, refLat, refLong, file):
     tacobject["country"] = country
     tacobject["group"] = group
     tacobject["status"] = status
-    if id == "0":
-        print(line)
-    
     return tacobject
+
 def readFile(file, targets):
     linenumber = 0
     fileStarted = False
@@ -90,11 +90,36 @@ parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=[
                                                                                 'H:/5.acmi'],
                     help='unzipped tacview file')
 args = parser.parse_args()
-targets = {}
 print(args.tacviewFile)
 for file in args.tacviewFile:
     readFile(file, targets)
     
+linenumber = 0
+fileStarted = False
+refLong = Decimal(0.00)
+refLat = Decimal(0.00)
+time = 0
+with open(args.tacviewFile) as f:
+    for line in f:
+        linenumber = linenumber + 1
+        if line[0] == "#":
+            fileStarted = True
+            time = Decimal(line[1:])
+        elif fileStarted:
+            split_line = line.split(",")
+            id = split_line[0]
+            if id[0] == "-":
+                pass
+                #TODO delete tecical object
+            elif id == "0":
+                pass
+                #TODO handle special object
+            elif not id in targets:
+                targets[id] = parseLine(line, refLat, refLong)
+        elif "ReferenceLongitude" in line:
+            refLong = Decimal(line.split("=")[1])
+        elif "ReferenceLatitude" in line:
+            refLat = Decimal(line.split("=")[1])
     
 longmax = Decimal(0.0)
 longmin = Decimal(90.0)
