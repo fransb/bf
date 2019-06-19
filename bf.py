@@ -2,6 +2,14 @@ import argparse
 from decimal import *
 from operator import itemgetter
 #102,T=5.738246|3.5607517|1|||359|-151467.48|-65955.93|,Type=Ground+Static+Aerodrome,Name=Oil rig,Color=Red,Coalition=Allies,Country=us
+import json
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
+
 def sortDist(val): 
     return float(val["distance"])
 def parseLine(line, refLat, refLong, file):
@@ -89,12 +97,20 @@ parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=[
                                                                                 'H:/4.acmi',
                                                                                 'H:/5.acmi'],
                     help='unzipped tacview file')
+parser.add_argument('--json', metavar='json', nargs='?',
+                    help='json')
 args = parser.parse_args()
 targets = {}
-print(args.tacviewFile)
-for file in args.tacviewFile:
-    readFile(file, targets)
-    
+print(args.json)
+if args.json == "": 
+    for file in args.tacviewFile:
+        readFile(file, targets)
+else:
+    with open(args.json) as json_file:  
+        targets = json.load(json_file, cls=DecimalEncoder)
+
+with open('data.json', 'w') as f:  # writing JSON object
+    json.dump(targets, f, cls=DecimalEncoder)
     
 longmax = Decimal(0.0)
 longmin = Decimal(90.0)
@@ -112,12 +128,12 @@ for target in targets.values():
         #print(target)
 newTarget = True
 while newTarget :
-    #lat = Decimal(input("Enter latitude for target in format " + str(latmin) + "-" + str(latmax) + ": ").replace(",","."))
-    lat = Decimal(27.1024)
-    #long = Decimal(input("Enter longitude for target in format " + str(longmin) + "-" + str(longmax) + ": ").replace(",","."))
-    long = Decimal(56.1035)
-    #targettype = input("Enter type a=all, aa=AntiAircraft, b=Building [aa]: ")
-    targettype = "a"
+    lat = Decimal(input("Enter latitude for target in format " + str(latmin) + "-" + str(latmax) + ": ").replace(",","."))
+    #lat = Decimal(27.1024)
+    long = Decimal(input("Enter longitude for target in format " + str(longmin) + "-" + str(longmax) + ": ").replace(",","."))
+    #long = Decimal(56.1035)
+    targettype = input("Enter type a=all, aa=AntiAircraft, b=Building [aa]: ")
+    #targettype = "a"
     if targettype == "":
         targettype = "aa"
     distanses = []
