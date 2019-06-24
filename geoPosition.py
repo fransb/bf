@@ -6,31 +6,43 @@ class geoPosition:
     def __init__(self):
         self._lat = latType(PosType.Lat)
         self._long = latType(PosType.Long)
-
-    def setLat(self,
-               hemisphere: Hemisphere,
-               degree: int,
-               minute: int,
-               second: int,
-               millisecond: int):
-        self._lat.hemisphere = hemisphere
-        self._lat.degree = degree
-        self._lat.minute = minute
-        self._lat.second = second
-        self._lat.millisecond = millisecond
-
-    def setLong(self,
-               hemisphere: Hemisphere,
-               degree: int,
-               minute: int,
-               second: int,
-               millisecond: int):
+    
+    def parseLat(self, line, refLat, file):
+        parseDegree=int(line.split(".")[0])+refLat
+        deci=int(line.split(".")[0]).ljust(8,"0")
+        if parseDegree > 0:
+            parseHemiSphere = Hemisphere.N
+        else :
+            parseHemiSphere = Hemisphere.S
+            parseDegree = -parseDegree
+        parseMinute = int(deci[0:1])
+        parseSecond = int(deci[2:3])
+        parseMillisecond = int(deci[4:6])
         
-        self._long.hemisphere = hemisphere
-        self._long.degree = degree
-        self._long.minute = minute
-        self._long.second = second
-        self._long.millisecond = millisecond
+        self._lat.hemisphere = parseHemiSphere
+        self._lat.degree = parseDegree
+        self._lat.minute = parseMinute
+        self._lat.second = parseSecond
+        self._lat.millisecond = parseMillisecond
+        
+
+    def parseLong(self, line, refLong, file):
+        parseDegree=int(line.split(".")[0])+refLong
+        deci=line.split(".")[0].ljust(7,"0")
+        if parseDegree > 0:
+            parseHemiSphere = Hemisphere.E
+        else :
+            parseHemiSphere = Hemisphere.W
+            parseDegree = -parseDegree
+        parseMinute = int(deci[0:1])
+        parseSecond = int(deci[2:3])
+        parseMillisecond = int(deci[4:6])
+        
+        self._long.hemisphere = parseHemiSphere
+        self._long.degree = parseDegree
+        self._long.minute = parseMinute
+        self._long.second = parseSecond
+        self._long.millisecond = parseMillisecond
 
     def __str__(self):
         return str(self._lat)+" "+str(self._long)

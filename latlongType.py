@@ -1,10 +1,5 @@
 from enum import Enum
-class Hemisphere(Enum):
-    N = 0
-    S = 1
-    E = 2
-    W = 3
-    undeclared = 4
+from localTypes import Hemisphere
 
 class PosType(Enum):
     Long = 0
@@ -82,8 +77,8 @@ class latType:
 
     @millisecond.setter
     def millisecond(self, millisecond):
-        if (millisecond > 99 or millisecond < 0):
-            raise ValueError("Sorry millisecond shall be 0-99")
+        if (millisecond > 999 or millisecond < 0):
+            raise ValueError("Sorry millisecond shall be 0-999")
         self._millisecond=millisecond
 
     def __str__(self):
@@ -93,8 +88,8 @@ class latType:
             posString = self._hemisphere.name+str(self._degree).zfill(3)
         else:
             raise ValueError("Sorry error")
-        return posString+"°"+str(self._minute).zfill(2)+"\'"+str(self._second).zfill(2)+"\""+str(self._millisecond).zfill(2)
+        return posString+"°"+str(self._minute).zfill(2)+"\'"+str(self._second).zfill(2)+"\""+str(self._millisecond).zfill(3)
 
     def getDecimalDegree(self):
-        return float(self._degree)+float(self._minute)/float(60)+float(self._second)/float(3600)+float(self._millisecond)/float(360000)
+        return float(self._degree)+float(self._minute)/float(60)+float(self._second)/float(3600)+float(self._millisecond)/float(3600000)
             

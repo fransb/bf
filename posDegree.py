@@ -10,3 +10,9 @@ class posDegree:
         
     
     quadrant = None
+    degree = 0
+    minute = 0
+    second = 0
+    milliSecond = 0
+    
+    

@@ -4,6 +4,10 @@ from operator import itemgetter
 import json
 import zlib
 import math
+from tacticalObject import *
+from latlongType import *
+
+
 def printTarget(targets, long, lat, targettype, dead):
     distanses = []
     for target in targets.values():
@@ -31,64 +35,15 @@ def printTarget(targets, long, lat, targettype, dead):
             closest = closest + 1
 def sortDist(val): 
     return float(val["distance"])
-def parseLine(line, refLat, refLong, file):
-    tacobject = dict()
-    id = ""
-    long = 0.0
-    lat = 0.0
-    alt = 0.0
-    type = ""
-    name = ""
-    color = ""
-    coalition = ""
-    country = ""
-    group = ""
-    status = "alive"
-    doPrint = False
     
-    for part in line.rstrip().split(","):
-        if "T=" in part:
-            if not part.split("|")[0].replace("T=","") == "":
-                long = float(part.split("|")[0].replace("T=",""))+refLong
-            if not part.split("|")[1] == "":
-                lat = float(part.split("|")[1])+refLat
-            if not part.split("|")[2] == "":
-                alt = float(part.split("|")[2])
-        elif "Type=" in part:
-            type = part.replace("Type=","")
-        elif "Name=" in part:
-            name = part.replace("Name=","")
-        elif "Color=" in part:
-            color = part.replace("Color=","")
-        elif "Coalition=" in part:
-            coalition = part.replace("Coalition=","")
-        elif "Country=" in part:
-            country = part.replace("Country=","")
-        elif "Group=" in part:
-            group = part.replace("Group=","")
-        elif not "=" in part :
-            id = part.rstrip()
-    tacobject["id"] = id + file
-    tacobject["long"] = long
-    tacobject["lat"] = lat
-    tacobject["alt"] = alt
-    tacobject["type"] = type
-    tacobject["name"] = name
-    tacobject["color"] = color
-    tacobject["coalition"] = coalition
-    tacobject["country"] = country
-    tacobject["group"] = group
-    tacobject["status"] = status
-    if doPrint:
-        print(tacobject)
-        print(line)
+
     
     return tacobject
 def readFile(file, targets):
     linenumber = 0
     fileStarted = False
-    refLong = 0.00
-    refLat = 0.00
+    refLong = 0
+    refLat = 0
     time = 0
     print("Reading File: " + file)
     with open(file) as f:
@@ -101,17 +56,19 @@ def readFile(file, targets):
                 split_line = line.split(",")
                 id = split_line[0].rstrip()
                 if id[0] == "-":
-                    targets[id[1:]+file]["status"]="dead"
+                    targets[id[1:]+file].status = "dead"
                     #TODO delete tecical object
                 elif id == "0":
                     pass
                     #TODO handle special object
                 elif not id+file in targets:
-                    targets[id+file] = parseLine(line, refLat, refLong, file)
+                    newTacticalObject = tacticalObject()
+                    newTacticalObject.parseLine(line, refLat, refLong, file)
+                    targets[id+file] = newTacticalObject
             elif "ReferenceLongitude" in line:
-                refLong = float(line.split("=")[1])
+                refLong = int(line.split("=")[1])
             elif "ReferenceLatitude" in line:
-                refLat = float(line.split("=")[1])
+                refLat = int(line.split("=")[1])
 parser = argparse.ArgumentParser(description='Get targets')
 parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=['H:/Tacview.txt.acmi',
                                                                                 #'H:/1.acmi',
@@ -133,24 +90,25 @@ parser.set_defaults(loop=False)
 args = parser.parse_args()
 targets = {}
 print(args.json)
+
 if args.json == None: 
     for file in args.tacviewFile:
         readFile(file, targets)
-        with open('data.json', 'w') as f:  # writing JSON object
-            json.dump(targets, f)
-            original_data = open('data.json', 'rb').read()  
-            compressed_data = zlib.compress(original_data, zlib.Z_BEST_COMPRESSION)
-            f = open('data.json.compressed', 'wb')  
-            f.write(compressed_data)  
-            f.close()
-else:
-    try:
-        json_file=open(args.json, "r")
-        targets = json.load(json_file)
-    except:
-        compressed_file=open(args.json+".compressed", "rb")
-        decompressed_data = zlib.decompress(compressed_file.read())
-        targets = json.load(decompressed_data)#TODO something is broken
+#        with open('data.json', 'w') as f:  # writing JSON object
+#            json.dump(targets, f)
+#            original_data = open('data.json', 'rb').read()  
+#            compressed_data = zlib.compress(original_data, zlib.Z_BEST_COMPRESSION)
+#            f = open('data.json.compressed', 'wb')  
+#            f.write(compressed_data)  
+#            f.close()
+#else:
+#    try:
+#        json_file=open(args.json, "r")
+#        targets = json.load(json_file)
+#    except:
+#        compressed_file=open(args.json+".compressed", "rb")
+#        decompressed_data = zlib.decompress(compressed_file.read())
+#        targets = json.load(decompressed_data)#TODO something is broken
 
 
 longmax = 0.0
@@ -158,15 +116,16 @@ longmin = 90.0
 latmax = 0.0
 latmin = 90.0
 for target in targets.values():
-    if longmax < target["long"]:
-        longmax = target["long"]
-    if latmax < target["lat"]:
-        latmax = target["lat"]
-    if longmin > target["long"]:
-        longmin = target["long"]
-    if latmin > target["lat"]:
-        latmin = target["lat"]
+    if latmax < target.geoPosition.getDecimalDegreeLong():
+        longmax = target.geoPosition.getDecimalDegreeLong()
+#    if latmax < target["lat"]:
+#        latmax = target["lat"]
+#    if longmin > target["long"]:
+#        longmin = target["long"]
+#    if latmin > target["lat"]:
+#        latmin = target["lat"]
         #print(target)
+
 if not args.p:
     newTarget = True
     while newTarget :
