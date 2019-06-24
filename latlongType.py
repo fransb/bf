@@ -92,4 +92,19 @@ class latType:
 
     def getDecimalDegree(self):
         return float(self._degree)+float(self._minute)/float(60)+float(self._second)/float(3600)+float(self._millisecond)/float(3600000)
-            
+
+    def getRaw(self):
+        return str(self._degree)+"."+str(self._minute)+str(self._second)+str(self._millisecond)
+
+    def __eq__(self, other):
+        return not self.getDecimalDegree()<other.getDecimalDegree() and not other.getDecimalDegree()<self.getDecimalDegree()
+    def __ne__(self, other):
+        return self.getDecimalDegree()<othergetDecimalDegree() or other.getDecimalDegree()<self.getDecimalDegree()
+    def __gt__(self, other):
+        return other.getDecimalDegree()<self.getDecimalDegree()
+    def __ge__(self, other):
+        return not self.getDecimalDegree()<other.getDecimalDegree()
+    def __le__(self, other):
+        return not other.getDecimalDegree()<self.getDecimalDegree()
+        
+    

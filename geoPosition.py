@@ -7,9 +7,17 @@ class geoPosition:
         self._lat = latType(PosType.Lat)
         self._long = latType(PosType.Long)
     
+    @property
+    def lat(self):
+        return self._lat
+        
+    @property
+    def long(self):
+        return self._long
+    
     def parseLat(self, line, refLat, file):
         parseDegree=int(line.split(".")[0])+refLat
-        deci=int(line.split(".")[0]).ljust(8,"0")
+        deci=line.split(".")[0].ljust(7,"0")
         if parseDegree > 0:
             parseHemiSphere = Hemisphere.N
         else :
@@ -52,7 +60,7 @@ class geoPosition:
 
     def getDecimalDegreeLong(self):
         return self._long.getDecimalDegree()
- 
+        
     def calcDistance(self, refPoint):
         """
         Calculate the great circle distance between two points 

@@ -7,32 +7,17 @@ import math
 from tacticalObject import *
 from latlongType import *
 
+def printTarget(targets, refPos):
+    targetList = list(targets.values())
+    print(targetList)
+    targetList.sort(key=geoPosition.calcDistance(refPos))
+    i = 0
+    while True :
+        print(targetList[i].geoposition)
+        i=i+1
+        if i>20:
+            break
 
-def printTarget(targets, long, lat, targettype, dead):
-    distanses = []
-    for target in targets.values():
-        if "Ground" in target["type"] or "Sea" in target["type"] :
-            found = False
-            
-            if targettype == "a" :
-                found = True
-            elif "AntiAircraft" in target["type"] and targettype == "aa" :
-                found = True
-            elif "Building" in target["type"] and targettype == "b" :
-                found = True
-            if dead or target["status"] == "dead":
-                found = False
-            if found :
-                distance = math.sqrt((target["lat"]-lat)**2+(target["long"]-long)**2)
-                target["distance"]=distance
-                distanses.append(target)
-
-    distanses.sort(key = sortDist)
-    closest = 0
-    for distance in distanses:
-        if (distance["distance"] < Decimal(0.1)) or closest < 20: 
-            print(distance["status"]+", "+distance["type"]+", "+distance["name"]+", "+str(distance["lat"])+", "+str(distance["long"])+", "+str(distance["alt"])+" m, " + distance["group"]+", "+str(distance["distance"]))
-            closest = closest + 1
 def sortDist(val): 
     return float(val["distance"])
     
@@ -79,8 +64,8 @@ parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=[
                                                                                 ],
                     help='unzipped tacview file')
 parser.add_argument('--json', metavar='json', nargs='?', help='json')
-parser.add_argument('-o', metavar='longitude', type=float, nargs='?', help='an integer for the longitude', default='56.223681')
-parser.add_argument('-a', metavar='latitude', type=float, nargs='?', help='an integer for the latitude', default='27.131101')
+parser.add_argument('-o', metavar='longitude', nargs='?', help='an integer for the longitude', default='56.223681')
+parser.add_argument('-a', metavar='latitude', nargs='?', help='an integer for the latitude', default='27.131101')
 parser.add_argument('-p', help='only arguments', action='store_true')
 parser.add_argument('--target', default='a', const='a', nargs='?', choices=["a", "aa", "b"], help='list antiair, all, or building (default: %(default)s)')
 parser.add_argument('--dead', help='print dead units')
@@ -111,13 +96,13 @@ if args.json == None:
 #        targets = json.load(decompressed_data)#TODO something is broken
 
 
-longmax = 0.0
+longmax = latType(PosType.Lat)
 longmin = 90.0
 latmax = 0.0
 latmin = 90.0
 for target in targets.values():
-    if latmax < target.geoPosition.getDecimalDegreeLong():
-        longmax = target.geoPosition.getDecimalDegreeLong()
+    if longmax < target.geoPosition.long:
+        longmax = target.geoPosition.long
 #    if latmax < target["lat"]:
 #        latmax = target["lat"]
 #    if longmin > target["long"]:
@@ -145,4 +130,8 @@ else:
     dead=True
     if args.dead is None:
         dead=False
-    printTarget(targets, args.o, args.a, args.target, dead)
+    refPos = geoPosition()
+    refPos.parseLong(args.o, 0, "")
+    refPos.parseLat(args.a, 0, "")
+
+    printTarget(targets, refPos)
