@@ -7,11 +7,18 @@ import math
 from tacticalObject import *
 from latlongType import *
 
-def printTarget(targets, refPos):
+def printTarget(targets, refPos, filter):
     targetList = list(targets.values())
 
-
-    for target in targetList: 
+    for target in targetList:
+        if "name" in filter:
+            if filter["name"] in target.name:
+                target.towrite = True
+            else:
+                target.towrite = False
+                #print(target.name)
+        else:
+            target.towrite = True
         target.setDistance(refPos)
     targetList.sort()
 
@@ -65,6 +72,7 @@ parser.add_argument('--json', metavar='json', nargs='?', help='json')
 parser.add_argument('-o', metavar='longitude', nargs='?', help='an integer for the longitude', default='55.540865')
 parser.add_argument('-a', metavar='latitude', nargs='?', help='an integer for the latitude', default='26.452904')
 parser.add_argument('-p', help='only arguments', action='store_true')
+parser.add_argument('-n', metavar='name', nargs='?', help='name')
 parser.add_argument('--target', default='a', const='a', nargs='?', choices=["a", "aa", "b"], help='list antiair, all, or building (default: %(default)s)')
 parser.add_argument('--dead', help='print dead units')
 parser.add_argument('--loop', dest='loop', action='store_true')
@@ -109,7 +117,7 @@ for target in targets.values():
 #        latmin = target["lat"]
         #print(target)
 
-if False:#not args.p:
+if not args.p:
     newTarget = True
     while newTarget :
         lat = float(input("Enter latitude for target in format " + str(latmin) + "-" + str(latmax) + ": ").replace(",","."))
@@ -131,5 +139,9 @@ else:
     refPos = geoPosition()
     refPos.parseGeoLat(args.a)
     refPos.parseGeoLong(args.o)
+    filter = {}
+    if not args.n == None:
+        filter["name"]=args.n
+    print(filter)
 
-    printTarget(targets, refPos)
+    printTarget(targets, refPos, filter)

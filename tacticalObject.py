@@ -13,7 +13,8 @@ class tacticalObject:
         self._group = ""
         self._id = ""
         self._status = ""
-    
+        self._towrite = True
+
     @property
     def geoPosition(self):
         return self._geoPosition
@@ -21,7 +22,15 @@ class tacticalObject:
     @geoPosition.setter
     def geoPosition(self, geoPosition):
         self._geoPosition
-	
+        
+    @property
+    def towrite(self):
+        return self._towrite
+
+    @towrite.setter
+    def towrite(self, towrite):
+        self._towrite = towrite
+
     @property
     def objectTypes(self):
         return self._objectTypes
@@ -29,7 +38,7 @@ class tacticalObject:
     @objectTypes.setter
     def objectTypes(self, objectTypes):
         self._objectTypes
-        
+
     @property
     def fileName(self):
         return self._fileName
@@ -164,4 +173,12 @@ class tacticalObject:
                 " status: " + self._status
 
     def __lt__(self, other):
-        return  ((self.distance < other.distance) and (self.distance < other.distance))        
+        if self.towrite and other.towrite:
+            #print("self:  " + self._name + str(self.print))
+            #print("other: " + other.name + str(other.print))
+            return (self.distance < other.distance)
+        elif not self.towrite:
+            return False
+        else:
+
+            return True
