@@ -6,6 +6,13 @@ class tacticalObject:
 
     def __init__(self):
         self._geoPosition = geoPosition()
+        self._name = ""
+        self._color = ""
+        self._coalition = ""
+        self._country = ""
+        self._group = ""
+        self._id = ""
+        self._status = ""
     
     @property
     def geoPosition(self):
@@ -103,16 +110,23 @@ class tacticalObject:
     def status(self, status):
         self._status
 
+    @property
+    def distance(self):
+        return self._distance
+
     def parseLine(self, line, refLat, refLong, file):
         for part in line.rstrip().split(","):
+            #print(line)
             if "T=" in part:
                 long = part.split("|")[0].replace("T=","")
+                #print(long)
                 lat = part.split("|")[1]
+                #print(lat)
                 alt = part.split("|")[2]
                 if not long == "":
                     self._geoPosition.parseLong(long, refLong, file)
                 if not lat == "":
-                    self._geoPosition.parseLong(lat, refLat, file)
+                    self._geoPosition.parseLat(lat, refLat, file)
                 if not alt == "":
                     self._altitude = alt
             elif "Type=" in part:
@@ -128,5 +142,26 @@ class tacticalObject:
             elif "Group=" in part:
                 self._group = part.replace("Group=","")
             elif not "=" in part :
-                self._id = part.rstrip()
+                self._id = part.rstrip()+file
         self._status="Alive"
+
+    def setDistance(self, refPos):
+        self._distance = self._geoPosition.calcDistance(refPos)
+        
+
+    def __str__(self):
+        #print(self._distance)
+        return str(self._geoPosition) +"    Distance: " + \
+                format(self._distance*1000, '.3f') + " km  " + \
+                str(self._geoPosition.getDecimalDegreeLat())+", "+str(self._geoPosition.getDecimalDegreeLong()) + \
+                " Type: " + self._objectType + \
+                " Name: " + self._name + \
+                " Color: " + self._color + \
+                " Coalition: " + self._coalition + \
+                " Country: " + self._country + \
+                " Group: " + self._group + \
+                " id: " + self._id + \
+                " status: " + self._status
+
+    def __lt__(self, other):
+        return  ((self.distance < other.distance) and (self.distance < other.distance))        

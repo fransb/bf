@@ -14,52 +14,88 @@ class geoPosition:
     @property
     def long(self):
         return self._long
-    
-    def parseLat(self, line, refLat, file):
-        parseDegree=int(line.split(".")[0])+refLat
-        deci=line.split(".")[0].ljust(7,"0")
+
+
+    def parseGeoLat(self, data):
+        parseDegree=float(int(data.split(".")[0]))
+        deci=data.split(".")[1].ljust(8,"0")
+
         if parseDegree > 0:
             parseHemiSphere = Hemisphere.N
         else :
             parseHemiSphere = Hemisphere.S
             parseDegree = -parseDegree
-        parseMinute = int(deci[0:1])
-        parseSecond = int(deci[2:3])
-        parseMillisecond = int(deci[4:6])
+
+        parseDegree = parseDegree + int(deci[0:2])/60
+        parseDegree = parseDegree + int(deci[2:4])/3600
+        parseDegree = parseDegree + int(deci[4:6])/360000
+        print(parseDegree)
+        #parseMillisecond = int(deci[4:6])
+        
         
         self._lat.hemisphere = parseHemiSphere
         self._lat.degree = parseDegree
-        self._lat.minute = parseMinute
-        self._lat.second = parseSecond
-        self._lat.millisecond = parseMillisecond
+        print(str(self._lat))
         
 
-    def parseLong(self, line, refLong, file):
-        parseDegree=int(line.split(".")[0])+refLong
-        deci=line.split(".")[0].ljust(7,"0")
+    def parseGeoLong(self, data):
+        parseDegree=float(data.split(".")[0])
+        deci=data.split(".")[1].ljust(8,"0")
         if parseDegree > 0:
             parseHemiSphere = Hemisphere.E
         else :
             parseHemiSphere = Hemisphere.W
             parseDegree = -parseDegree
-        parseMinute = int(deci[0:1])
-        parseSecond = int(deci[2:3])
-        parseMillisecond = int(deci[4:6])
+        parseDegree = parseDegree + int(deci[0:2])/60
+        parseDegree = parseDegree + int(deci[2:4])/3600
+        parseDegree = parseDegree + int(deci[4:6])/360000
+        print(parseDegree)
+        #parseMillisecond = int(deci[4:6])
+        
         
         self._long.hemisphere = parseHemiSphere
         self._long.degree = parseDegree
-        self._long.minute = parseMinute
-        self._long.second = parseSecond
-        self._long.millisecond = parseMillisecond
+        print(str(self._long))
+    
+    def parseLat(self, line, refLat, file):
+        parseDegree=float(line)+float(refLat)
+        #print("Latitude: "+format(parseDegree, '.7f')+'\n')
+        
+        if parseDegree > 0:
+            parseHemiSphere = Hemisphere.N
+        else :
+            parseHemiSphere = Hemisphere.S
+            parseDegree = -parseDegree
+        
+        self._lat.hemisphere = parseHemiSphere
+        self._lat.degree = parseDegree
+
+        
+        
+
+    def parseLong(self, line, refLong, file):
+        parseDegree=float(line)+float(refLong)
+        #print("Longitude: "+format(parseDegree, '.7f')+'\n')
+        if parseDegree > 0.0:
+            parseHemiSphere = Hemisphere.E
+        else :
+            parseHemiSphere = Hemisphere.W
+            parseDegree = -parseDegree
+
+        
+        self._long.hemisphere = parseHemiSphere
+        self._long.degree = parseDegree
+
+        #print(self._long)
 
     def __str__(self):
         return str(self._lat)+" "+str(self._long)
 
     def getDecimalDegreeLat(self):
-        return self._lat.getDecimalDegree()
+        return self._lat.degree
 
     def getDecimalDegreeLong(self):
-        return self._long.getDecimalDegree()
+        return self._long.degree
         
     def calcDistance(self, refPoint):
         """

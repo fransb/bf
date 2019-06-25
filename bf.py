@@ -9,21 +9,19 @@ from latlongType import *
 
 def printTarget(targets, refPos):
     targetList = list(targets.values())
-    print(targetList)
-    targetList.sort(key=geoPosition.calcDistance(refPos))
+
+
+    for target in targetList: 
+        target.setDistance(refPos)
+    targetList.sort()
+
     i = 0
     while True :
-        print(targetList[i].geoposition)
+        print(targetList[i])
         i=i+1
         if i>20:
             break
 
-def sortDist(val): 
-    return float(val["distance"])
-    
-
-    
-    return tacobject
 def readFile(file, targets):
     linenumber = 0
     fileStarted = False
@@ -55,17 +53,17 @@ def readFile(file, targets):
             elif "ReferenceLatitude" in line:
                 refLat = int(line.split("=")[1])
 parser = argparse.ArgumentParser(description='Get targets')
-parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=['H:/Tacview.txt.acmi',
-                                                                                #'H:/1.acmi',
-                                                                                #'H:/2.acmi',
-                                                                                #'H:/3.acmi',
-                                                                                #'H:/4.acmi',
-                                                                                #'H:/5.acmi'
+parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=[#'H:/Tacview.txt.acmi',
+                                                                                'H:/1.acmi',
+                                                                                'H:/2.acmi',
+                                                                                'H:/3.acmi',
+                                                                                'H:/4.acmi',
+                                                                                'H:/5.acmi'
                                                                                 ],
                     help='unzipped tacview file')
 parser.add_argument('--json', metavar='json', nargs='?', help='json')
-parser.add_argument('-o', metavar='longitude', nargs='?', help='an integer for the longitude', default='56.223681')
-parser.add_argument('-a', metavar='latitude', nargs='?', help='an integer for the latitude', default='27.131101')
+parser.add_argument('-o', metavar='longitude', nargs='?', help='an integer for the longitude', default='55.540865')
+parser.add_argument('-a', metavar='latitude', nargs='?', help='an integer for the latitude', default='26.452904')
 parser.add_argument('-p', help='only arguments', action='store_true')
 parser.add_argument('--target', default='a', const='a', nargs='?', choices=["a", "aa", "b"], help='list antiair, all, or building (default: %(default)s)')
 parser.add_argument('--dead', help='print dead units')
@@ -111,7 +109,7 @@ for target in targets.values():
 #        latmin = target["lat"]
         #print(target)
 
-if not args.p:
+if False:#not args.p:
     newTarget = True
     while newTarget :
         lat = float(input("Enter latitude for target in format " + str(latmin) + "-" + str(latmax) + ": ").replace(",","."))
@@ -131,7 +129,7 @@ else:
     if args.dead is None:
         dead=False
     refPos = geoPosition()
-    refPos.parseLong(args.o, 0, "")
-    refPos.parseLat(args.a, 0, "")
+    refPos.parseGeoLat(args.a)
+    refPos.parseGeoLong(args.o)
 
     printTarget(targets, refPos)

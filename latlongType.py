@@ -10,10 +10,7 @@ class latType:
 
     def __init__(self,posType : PosType):
         self._hemisphere = Hemisphere.undeclared
-        self._degree = 0
-        self._minute = 0
-        self._second = 0
-        self._millisecond = 0
+        self._degree = 0.0
         self._type = posType
 
     @property
@@ -36,7 +33,7 @@ class latType:
 
     @property
     def type(self):
-        return self._degree
+        return self._type
 
     @property
     def degree(self):
@@ -50,61 +47,44 @@ class latType:
             raise ValueError("Sorry degree shall be 0-180")
         self._degree=degree
 
-    @property
-    def minute(self):
-        return self._minute
-
-    @minute.setter
-    def minute(self, minute):
-        if (minute > 59 or minute < 0):
-            raise ValueError("Sorry minute shall be 0-59")
-        self._minute=minute
-        
-
-    @property
-    def second(self):
-        return self._second
-
-    @second.setter
-    def second(self, second):
-        if (self.second > 59 or self.second < 0):
-            raise ValueError("Sorry second shall be 0-59")
-        self._second=second
-
-    @property
-    def millisecond(self):
-        return self._millisecond
-
-    @millisecond.setter
-    def millisecond(self, millisecond):
-        if (millisecond > 999 or millisecond < 0):
-            raise ValueError("Sorry millisecond shall be 0-999")
-        self._millisecond=millisecond
-
+  
     def __str__(self):
+        d = int(self._degree)
+        m = int((self._degree - d) * 60)
+        s = int((self._degree - d - m/60) * 3600)
+        ms = int((self._degree - d - m/60 - s/3600)*360000)
+        mms = int((self._degree - d - m/60- s/3600- ms/360000)*36000000)
+
+        #print("degree: " + str(self._degree))
+        #print("minute: " + str(self._degree - d))
+        #print("second: " + str(self._degree - d - m/60))
+        #print("millisecond: " + str((self._degree - d - m/60 - s/3600)*360000))
+
         if (self._type == PosType.Lat):
-            posString = self._hemisphere.name+str(self._degree).zfill(2)
+            posString = self._hemisphere.name + " " + str(d).zfill(2)
         elif (self._type == PosType.Long):
-            posString = self._hemisphere.name+str(self._degree).zfill(3)
+            posString = self._hemisphere.name + " " + str(d).zfill(3)
         else:
             raise ValueError("Sorry error")
-        return posString+"°"+str(self._minute).zfill(2)+"\'"+str(self._second).zfill(2)+"\""+str(self._millisecond).zfill(3)
 
-    def getDecimalDegree(self):
-        return float(self._degree)+float(self._minute)/float(60)+float(self._second)/float(3600)+float(self._millisecond)/float(3600000)
+        
+        return posString+ "º "+ str(m).zfill(2)+ "' "+ str(s).zfill(2) + '" ' + str(ms).zfill(2) + " " +str(mms).zfill(2)
 
-    def getRaw(self):
-        return str(self._degree)+"."+str(self._minute)+str(self._second)+str(self._millisecond)
+#    def getDecimalDegree(self):
+#        return float(self._degree)+float(self._minute)/float(60)+float(self._second)/float(3600)+float(self._millisecond)/float(3600000)
+
+#    def getRaw(self):
+#        return str(self._degree)+"."+str(self._minute)+str(self._second)+str(self._millisecond)
 
     def __eq__(self, other):
-        return not self.getDecimalDegree()<other.getDecimalDegree() and not other.getDecimalDegree()<self.getDecimalDegree()
+        return not self.degree < other.degree and not other.degree < self.degree
     def __ne__(self, other):
-        return self.getDecimalDegree()<othergetDecimalDegree() or other.getDecimalDegree()<self.getDecimalDegree()
+        return self.degree < other.degree or other.degree < self.degree
     def __gt__(self, other):
-        return other.getDecimalDegree()<self.getDecimalDegree()
+        return other.degree < self.degree
     def __ge__(self, other):
-        return not self.getDecimalDegree()<other.getDecimalDegree()
+        return not self.degree < other.degree
     def __le__(self, other):
-        return not other.getDecimalDegree()<self.getDecimalDegree()
+        return not other.degree < self.degree
         
     
