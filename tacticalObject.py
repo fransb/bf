@@ -165,7 +165,9 @@ class tacticalObject:
         #print(self._distance)
         return str(self._geoPosition) + " altitude: " + str(int(round(self._altitude/0.3048))) + " feet Distance: " + \
                 format(self._distance*1000, '.3f') + " km  " + \
-                " Type: " + self._objectTypes + \
+                str(self._geoPosition.getDecimalDegreeLat())+", "+str(self._geoPosition.getDecimalDegreeLong()) + \
+                " altitude:" + self._altitude + \
+                " Type: " + self._objectType + \
                 " Name: " + self._name + \
                 " Color: " + self._color + \
                 " Group: " + self._group + \
