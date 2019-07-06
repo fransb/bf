@@ -21,6 +21,9 @@ def printTarget(targets, refPos, filter):
         if "color" in filter:
             if not filter["color"].lower() in target.color.lower():
                 target.towrite = False
+        if "status" in filter:
+            if not filter["status"].lower() in target.objectTypes.status():
+                target.towrite = False          
             
         target.setDistance(refPos)
     targetList.sort()
@@ -58,10 +61,14 @@ def readFile(file, targets):
                     newTacticalObject = tacticalObject()
                     newTacticalObject.parseLine(line, refLat, refLong, file)
                     targets[id+file] = newTacticalObject
+                else:
+                    targets[id+file].parseLine(line, refLat, refLong, file)
             elif "ReferenceLongitude" in line:
                 refLong = int(line.split("=")[1])
             elif "ReferenceLatitude" in line:
                 refLat = int(line.split("=")[1])
+
+
 parser = argparse.ArgumentParser(description='Get targets')
 parser.add_argument('--tacviewFile', metavar='tacviewFile', nargs='*', default=[#'H:/Tacview.txt.acmi',
                                                                                 'H:/1.acmi',
@@ -78,6 +85,7 @@ parser.add_argument('-p', help='only arguments', action='store_true')
 parser.add_argument('-n', metavar='name', nargs='?', help='name')
 parser.add_argument('-t', metavar='type', nargs='?', help='filter on typ ex: antiair')
 parser.add_argument('-c', metavar='type', nargs='?', help='filter on color ex: red/blue')
+parser.add_argument('-s', metavar='type', nargs='?', help='filter on status dead/alive')
 parser.add_argument('--dead', help='print dead units')
 parser.add_argument('--loop', dest='loop', action='store_true')
 parser.add_argument('--no-loop', dest='loop', action='store_false')
@@ -150,6 +158,8 @@ else:
         filter["type"]=args.t
     if not args.c == None:
         filter["color"]=args.c
+    if not args.s == None:
+        filter["status"]=args.s
     print(filter)
 
     printTarget(targets, refPos, filter)

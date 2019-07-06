@@ -10,10 +10,18 @@ class geoPosition:
     @property
     def lat(self):
         return self._lat
+
+    @lat.setter
+    def lat(self, lat):
+        self._lat = lat
         
     @property
     def long(self):
         return self._long
+
+    @long.setter
+    def long(self, long):
+        self._long = long
 
 
     def parseGeoLat(self, data):
