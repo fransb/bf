@@ -11,14 +11,17 @@ def printTarget(targets, refPos, filter):
     targetList = list(targets.values())
 
     for target in targetList:
+        target.towrite = True
         if "name" in filter:
-            if filter["name"] in target.name:
-                target.towrite = True
-            else:
+            if not filter["name"].lower() in target.name.lower():
                 target.towrite = False
-                #print(target.name)
-        else:
-            target.towrite = True
+        if "type" in filter:
+            if not filter["type"].lower() in target.objectTypes.lower():
+                target.towrite = False
+        if "color" in filter:
+            if not filter["color"].lower() in target.color.lower():
+                target.towrite = False
+            
         target.setDistance(refPos)
     targetList.sort()
 
@@ -73,7 +76,8 @@ parser.add_argument('-o', metavar='longitude', nargs='?', help='an integer for t
 parser.add_argument('-a', metavar='latitude', nargs='?', help='an integer for the latitude', default='26.452904')
 parser.add_argument('-p', help='only arguments', action='store_true')
 parser.add_argument('-n', metavar='name', nargs='?', help='name')
-parser.add_argument('--target', default='a', const='a', nargs='?', choices=["a", "aa", "b"], help='list antiair, all, or building (default: %(default)s)')
+parser.add_argument('-t', metavar='type', nargs='?', help='filter on typ ex: antiair')
+parser.add_argument('-c', metavar='type', nargs='?', help='filter on color ex: red/blue')
 parser.add_argument('--dead', help='print dead units')
 parser.add_argument('--loop', dest='loop', action='store_true')
 parser.add_argument('--no-loop', dest='loop', action='store_false')
@@ -142,6 +146,10 @@ else:
     filter = {}
     if not args.n == None:
         filter["name"]=args.n
+    if not args.t == None:
+        filter["type"]=args.t
+    if not args.c == None:
+        filter["color"]=args.c
     print(filter)
 
     printTarget(targets, refPos, filter)

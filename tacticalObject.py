@@ -14,6 +14,9 @@ class tacticalObject:
         self._id = ""
         self._status = ""
         self._towrite = True
+        self._objectTypes = ""
+        self._altitude = 0.0
+
 
     @property
     def geoPosition(self):
@@ -37,7 +40,7 @@ class tacticalObject:
 
     @objectTypes.setter
     def objectTypes(self, objectTypes):
-        self._objectTypes
+        self._objectTypes = objectTypes
 
     @property
     def fileName(self):
@@ -85,7 +88,7 @@ class tacticalObject:
 
     @color.setter
     def color(self, color):
-        self._color
+        self._color = color
 
     @property
     def coalition(self):
@@ -137,9 +140,9 @@ class tacticalObject:
                 if not lat == "":
                     self._geoPosition.parseLat(lat, refLat, file)
                 if not alt == "":
-                    self._altitude = alt
+                    self._altitude = float(alt)
             elif "Type=" in part:
-                self._objectType=part.replace("Type=","")
+                self._objectTypes=part.replace("Type=","")
             elif "Name=" in part:
                 self._name = part.replace("Name=","")
             elif "Color=" in part:
@@ -160,17 +163,17 @@ class tacticalObject:
 
     def __str__(self):
         #print(self._distance)
-        return str(self._geoPosition) +"    Distance: " + \
+        return str(self._geoPosition) + " altitude: " + str(int(round(self._altitude/0.3048))) + " feet Distance: " + \
                 format(self._distance*1000, '.3f') + " km  " + \
-                str(self._geoPosition.getDecimalDegreeLat())+", "+str(self._geoPosition.getDecimalDegreeLong()) + \
-                " Type: " + self._objectType + \
+                " Type: " + self._objectTypes + \
                 " Name: " + self._name + \
                 " Color: " + self._color + \
-                " Coalition: " + self._coalition + \
-                " Country: " + self._country + \
                 " Group: " + self._group + \
-                " id: " + self._id + \
                 " status: " + self._status
+#" Coalition: " + self._coalition + 
+#" Country: " + self._country + 
+#str(self._geoPosition.getDecimalDegreeLat())+", "+str(self._geoPosition.getDecimalDegreeLong()) + 
+#" id: " + self._id + 
 
     def __lt__(self, other):
         if self.towrite and other.towrite:
